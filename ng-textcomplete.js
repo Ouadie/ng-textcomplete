@@ -134,7 +134,7 @@ angular.module('ngTextcomplete', [])
     /**
      * Completer manager class.
      */
-    function Completer($el, strategies) {
+    function Completer($el, option) {
       var focus;
       this.el = $el.get(0); // textarea element
       focus = this.el === document.activeElement;
@@ -142,6 +142,7 @@ angular.module('ngTextcomplete', [])
       this.$el = wrapElement($el); // Focus is lost
       this.id = 'textComplete' + _id++;
       this.strategies = [];
+      this.option = option;
       if (focus) {
         this.initialize();
         this.$el.focus();
@@ -159,16 +160,25 @@ angular.module('ngTextcomplete', [])
        * Prepare ListView and bind events.
        */
       initialize: function() {
-        var $list, globalEvents;
+        var $list, globalEvents, appendTo, closestSelector;
         $list = $baseList.clone();
         this.listView = new ListView($list, this);
         this.$el
-          .before($list)
-          .on({
-            'keyup.textComplete': $.proxy(this.onKeyup, this),
-            'keydown.textComplete': $.proxy(this.listView.onKeydown,
-              this.listView)
-          });
+        .on({
+          'keyup.textComplete': $.proxy(this.onKeyup, this),
+          'keydown.textComplete': $.proxy(this.listView.onKeydown,
+            this.listView)
+        });
+        appendTo = this.option.appendTo;
+        closestSelector = this.option.closestSelector;
+        if (appendTo) {
+          // Append ListView to specified element.
+          $list.appendTo(appendTo instanceof $ ? appendTo : $(appendTo));
+        }else if(closestSelector){
+          this.$el.closest(closestSelector).before($list);
+        } else {
+          this.$el.before($list);
+        }
         globalEvents = {};
         globalEvents['click.' + this.id] = $.proxy(this.onClickDocument, this);
         globalEvents['keyup.' + this.id] = $.proxy(this.onKeyupDocument, this);
@@ -581,10 +591,11 @@ return ListView;
      * @param {Element} element
      * @param {Object} strategies
      */
-    function Textcomplete(element, strategies) {
+    function Textcomplete(element, strategies, option) {
       var i, l, strategy, dataKey;
 
       dataKey = 'textComplete';
+      option || (option = {});
 
       if (strategies === 'destroy') {
         return this.each(function () {
@@ -610,7 +621,7 @@ return ListView;
         var completer;
         completer = element.data(dataKey);
         if (!completer) {
-          completer = new Completer(element);
+          completer = new Completer(element, option);
           element.data(dataKey, completer);
         }
         completer.register(strategies);
