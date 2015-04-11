@@ -1,9 +1,9 @@
 {
   "name": "ng-textcomplete",
-  "version": "0.5.0",
-  "homepage": "https://github.com/fraserxu/ng-textcomplete",
+  "version": "0.5.2",
+  "homepage": "https://github.com/Ouadie/ng-textcomplete.git",
   "authors": [
-    "fraserxu <xvfeng123@gmail.com>"
+    "Ouadie <ouadie.boussaid@gmail.com>"
   ],
   "description": "autocompleting power to textareas, like GitHub comment forms have, with angularjs",
   "main": "ng-textcomplete.js",
